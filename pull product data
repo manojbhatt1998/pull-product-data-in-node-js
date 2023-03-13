@@ -1,0 +1,23 @@
+const http = require('http');
+
+var request = require('request');
+let apikey = 'af0d2b9944435a9359079595a615cb8e';
+let pass = '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';
+let endpoint = 'products';
+let shop = 'https://store.myshopify.com';
+
+let options = {
+   'method':'GET',
+   'url':`https://bhattmanoj97.myshopify.com/admin/api/2023-01/products.json?X-Shopify-Access-Token=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`,
+   'headers':{
+      'Content-type':'application/json',
+      'X-Shopify-Access-Token':'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'
+      
+   }
+}
+request(options,function(error,response){
+    if(error) throw new Error(error);
+    //console.log(response.body);
+});
+
+
