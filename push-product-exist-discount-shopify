@@ -1,0 +1,68 @@
+const request = require('request');
+const express = require('express');
+const app = express();
+const Shopify = require('shopify-api-node'); // Include the Shopify API library // install in command -- npm i shopify-api-node
+
+// API credentials
+let shopifyApiKey = '2d4e3a23abb9953f8b9aee3359972dcc';
+let shopifyPassword = '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';
+let shopifyStoreName = 'abc.myshopify.com';
+let apiUrl = `https://${shopifyStoreName}/admin/api/2023-07`;
+const endpoint = 'products';
+
+// Initialize Shopify API client with your credentials
+const shopify = new Shopify({
+  shopName: 'abc.myshopify.com',
+  apiKey: '2d4e3a23abb9953f8b9aee3359972dcc',
+  password: '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',
+});
+// Shopify API Headers
+const shopifyHeaders = {
+    'Content-type': 'application/json',
+    'Authorization': 'Basic ' + Buffer.from(`${shopifyApiKey}:${shopifyPassword}`).toString('base64')
+  };
+
+    // Fetch products from Shopify
+    request.get(`${apiUrl}/${endpoint}.json`, { headers: shopifyHeaders }, function (error, response, body) {
+        if (error) {
+          console.error(error);
+          res.status(500).send('An error occurred');
+          return;
+        }
+    
+        const productData = JSON.parse(body);
+        const targetTag = 'sale';
+    
+        // Filter products by tag
+        const filteredProducts = productData.products.filter(product =>
+          product.tags.includes(targetTag)
+        );
+         //console.log(filteredProducts);
+        // Extract product IDs from filtered products
+        const productIds = filteredProducts.map(product => product.id);
+        console.log(productIds);
+       
+
+        (async () => {
+            try {
+              // Create a price rule object with the existing price rule ID
+              const price_rule_id = 1210894319831;
+          
+              // Update the price rule's title and apply to specific product IDs
+              const updatedPriceRule = await shopify.priceRule.update(price_rule_id, {
+                title: '10%_off_api',
+                entitled_product_ids: productIds, 
+                target: {
+                  target_type: 'specific_products'
+                }
+              });
+          
+              console.log('Price rule updated successfully:', updatedPriceRule);
+            } catch (error) {
+              console.error('Error-bro:', error);
+            }
+          })();
+          
+
+      });
+
