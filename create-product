@@ -1,0 +1,30 @@
+const request = require('request');
+const express = require('express');
+const app = express();
+const apikey = '2d4e3a23abb9953f8b9aee3359972dcc';
+const pass = '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';
+const shop = 'your.myshopify.com';
+let options = {
+  'method': 'POST', // Use POST method to create a product
+  'url': `https://${shop}/admin/api/2023-07/products.json`, // Updated to use the correct API version
+  'headers': {
+    'Content-Type': 'application/json',
+    'Authorization': 'Basic ' + Buffer.from(apikey + ':' + pass).toString('base64'), // Use Basic Authentication
+  },
+  body: JSON.stringify({
+    "product": {
+      "title": "New product",
+      "body_html": "<p>7 chakra bracelet, in blue or black.</p>",
+      "vendor": "Company 123",
+      "product_type": "Bracelet"
+    }
+  })
+};
+app.get('/crproduct', (req, res) => {
+ request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+ });
+});
+
+app.listen(3000);
